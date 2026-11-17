@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>臨床藥事照護案例討論互動教學系統 | Case 1: Mr. Jobs</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            clinical: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#1e3a8a',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+    .case-paper-shadow {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    }
+    .pulse-badge {
+      animation: subtle-pulse 2.2s infinite;
+    }
+    @keyframes subtle-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.72; }
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: #ffffff;
+      }
+      .print-break-inside-avoid {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Top Navigation & Header -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <!-- Brand & Title -->
+        <div class="flex items-start sm:items-center gap-3">
+          <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner flex-shrink-0 mt-0.5 sm:mt-0">
+            <i data-lucide="stethoscope" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">
+                臨床藥事照護案例討論互動教學系統
+              </h1>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                eGFR &lt; 25 mL/min/1.73m² 專題
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Clinical Pharmacy Case Study Interactive Platform — 重度腎功能不全合併多重共病之處方評估
+            </p>
+          </div>
+        </div>
+
+        <!-- Mode Switcher & Version Metadata -->
+        <div class="flex flex-wrap items-center justify-between sm:justify-end gap-3">
+          <!-- Mode Toggle Button -->
+          <div class="inline-flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+            <button id="btn-mode-student" onclick="setTeachingMode('student')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-blue-600 text-white shadow">
+              <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+              <span>學生測驗模式 (隱藏解析)</span>
+            </button>
+            <button id="btn-mode-instructor" onclick="setTeachingMode('instructor')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white">
+              <i data-lucide="book-open-check" class="w-3.5 h-3.5"></i>
+              <span>教師指導模式 (顯示完整 DRP)</span>
+            </button>
+          </div>
+
+          <!-- Version & Date Pill -->
+          <div class="hidden xl:flex items-center gap-2 text-xs text-slate-400 bg-slate-800/90 px-3 py-1.5 rounded-lg border border-slate-700">
+            <i data-lucide="git-Commit" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Version: <strong class="text-slate-200">v1.1.0</strong></span>
+            <span class="text-slate-600">|</span>
+            <span>製作日期: <strong class="text-slate-200">2026-11-17</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex space-x-1 sm:space-x-2 mt-4 overflow-x-auto pb-1 scrollbar-none border-t border-slate-800 pt-3">
+        <button onclick="switchTab('case')" id="tab-btn-case" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-600/20 text-blue-300 border border-blue-500/40 whitespace-nowrap">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>1. 病患臨床病歷 (Case 1: Mr. Jobs)</span>
+        </button>
+        <button onclick="switchTab('meds')" id="tab-btn-meds" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 whitespace-nowrap">
+          <i data-lucide="pill" class="w-4 h-4"></i>
+          <span>2. 處方評估與互動測驗 (10 項用藥)</span>
+          <span class="px-1.5 py-0.2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded text-[11px]">DRP 挑戰</span>
+        </button>
+        <button onclick="switchTab('matrix')" id="tab-btn-matrix" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 whitespace-nowrap">
+          <i data-lucide="microscope" class="w-4 h-4"></i>
+          <span>3. 實證藥學總覽與腎功能計算機</span>
+        </button>
+        <button onclick="switchTab('soap')" id="tab-btn-soap" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 whitespace-nowrap">
+          <i data-lucide="clipboard-List" class="w-4 h-4"></i>
+          <span>4. 標準 SOAP 藥事照護紀錄 & 討論題</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Status Banner for Current Mode -->
+    <div id="mode-status-banner" class="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print">
+      <div class="flex items-center gap-2.5 text-amber-900 text-xs sm:text-sm">
+        <i data-lucide="help-circle" class="w-5 h-5 text-amber-600 flex-shrink-0"></i>
+        <span id="mode-status-text">
+          目前為<strong>「學生測驗模式」</strong>：病歷中的異常提示與 10 項用藥之 DRP 實證解析已隱藏。請先閱讀病歷，再至「2. 處方評估與互動測驗」進行臨床決策練習！
+        </span>
+      </div>
+      <div class="flex items-center gap-2 self-end sm:self-center">
+        <span class="text-xs text-slate-500 xl:hidden">v1.1.0 | 2026-11-17</span>
+        <button onclick="toggleClinicalClues()" id="btn-clue-toggle" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 transition">
+          顯示病歷關鍵紅旗提示 (Red Flags)
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: PATIENT CASE PROFILE (Image Replica) -->
+    <!-- ========================================== -->
+    <section id="tab-case" class="tab-panel space-y-6">
+      <!-- Replica of Uploaded Image Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-blue-700 case-paper-shadow p-5 sm:p-8">
+        
+        <!-- Header of Case Card -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-slate-200 gap-2">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-700 text-white p-2 rounded-lg">
+              <i data-lucide="file-plus-2" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Case 1: Mr. Jobs</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+              eGFR: 12 mL/min/1.73m² (Cr 5.5 mg/dL)
+            </span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+              Emergency Department Admission
+            </span>
+          </div>
+        </div>
+
+        <!-- Top Blue Summary Box (Matches Image Layout) -->
+        <div class="bg-[#f0f6ff] border border-blue-100 rounded-xl p-5 mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm sm:text-base leading-relaxed">
+            <div class="space-y-1.5">
+              <p><strong class="text-[#1e3a8a]">Patient:</strong> <span class="text-slate-800">Mr. Jobs, 72-year-old male</span></p>
+              <p><strong class="text-[#1e3a8a]">Height/Weight:</strong> <span class="text-slate-800">170 cm, 72 kg (BMI ≈ 24.9 kg/m², IBW ≈ 66.0 kg)</span></p>
+              <p><strong class="text-[#1e3a8a]">Presentation:</strong> <span class="text-slate-800">Presented to ER with worsening shortness of breath and a painful, non-healing right plantar diabetic foot ulcer.</span></p>
+            </div>
+            <div class="space-y-1.5">
+              <p>
+                <strong class="text-[#1e3a8a]">Chief Complaint (CC):</strong>
+                <span class="text-slate-800 italic"> “Doctor, I cannot breathe well, my legs are swelling, and my right foot wound hurts badly. <span class="clinical-clue rounded px-1 transition-all font-semibold text-blue-900">Also, I have been taking my Dapagliflozin for nearly 5 years—should I keep taking it?</span>”</span>
+              </p>
+              <p class="text-xs sm:text-sm text-slate-600 bg-white/70 px-3 py-1.5 rounded-lg border border-blue-200/60">
+                💬 <strong>病患主訴中譯：</strong>「醫師，我呼吸很喘、雙腳水腫，而且右腳傷口非常痛。另外，我的 <strong>Dapagliflozin 已經吃快 5 年了</strong>，現在還能繼續吃嗎？」
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- History of Present Illness (HPI) -->
+        <div class="mb-6">
+          <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a] mb-2">History of Present Illness (HPI):</h3>
+          <p class="text-sm sm:text-base text-slate-700 leading-relaxed">
+            Patient reports progressive shortness of breath for 2 weeks, worse on exertion. Associated with orthopnea, paroxysmal nocturnal dyspnea (PND), and bilateral leg swelling. He has a history of HFrEF, T2DM, and CKD, and <span class="clinical-clue rounded px-1 transition-all">has been stably taking oral <strong>Dapagliflozin 10 mg QD for nearly 5 years</strong> (initiated when his eGFR was &gt; 25 mL/min/1.73m²)</span>. In addition, he developed a right plantar diabetic foot ulcer 10 days ago. Five days prior to this ER visit, an outpatient clinic cultured <span class="font-medium text-slate-900">Methicillin-resistant <em>Staphylococcus aureus</em> (MRSA)</span> from the wound and initiated oral <span class="underline decoration-amber-400 decoration-2">Linezolid</span> and <span class="underline decoration-amber-400 decoration-2">Tramadol/Acetaminophen</span> for infection and wound pain control. Over the past 24 hours, he noted <span class="clinical-clue rounded px-1 transition-all">mild restlessness, hand tremors, and decreased urine output</span>. Denies chest pain or cough.
+          </p>
+        </div>
+
+        <!-- Two Column PMH & PSH/FH/SH (Matches Image Layout) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a] mb-2">Past Medical History (PMH):</h3>
+            <ul class="list-disc list-inside space-y-1.5 text-sm sm:text-base text-slate-700">
+              <li>Hypertension × 20 yrs</li>
+              <li>Type 2 Diabetes Mellitus × 15 yrs (with diabetic neuropathy &amp; foot ulcer)</li>
+              <li>Heart Failure with reduced Ejection Fraction (HFrEF)</li>
+              <li class="clinical-clue rounded px-1 transition-all">
+                Chronic Kidney Disease Stage 5 (<span class="font-semibold text-slate-900">eGFR 12 mL/min/1.73m²</span>, baseline 18 mL/min/1.73m², not on dialysis yet)
+              </li>
+              <li>Atrial Fibrillation (non-valvular)</li>
+              <li>Dyslipidemia</li>
+              <li>Peptic ulcer disease (PUD)</li>
+            </ul>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a] mb-1.5">Past Surgical History (PSH):</h3>
+              <p class="text-sm sm:text-base text-slate-700">CABG (Coronary artery bypass surgery) 8 years ago</p>
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a] mb-1.5">Family/Social History (FH/SH):</h3>
+              <ul class="list-disc list-inside space-y-1 text-sm sm:text-base text-slate-700">
+                <li>Father died of MI at 65</li>
+                <li>Mother had diabetes</li>
+                <li>Ex-smoker 30 pack-years (quit 10 yrs ago)</li>
+                <li>Denies alcohol use</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Physical Examination (PE) Box -->
+        <div class="border border-slate-200 rounded-xl p-5 mb-6 bg-white">
+          <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a] pb-2.5 mb-3.5 border-b border-slate-100">
+            Physical Examination (PE):
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm sm:text-base text-slate-700 leading-relaxed">
+            <div class="space-y-2">
+              <p>
+                <strong class="text-slate-900">Vitals:</strong> BP 160/90 mmHg, HR 98 irregular, RR 24, Temp 37.6°C, <span class="clinical-clue rounded px-1">SpO₂ 90% RA</span>
+              </p>
+              <p>
+                <strong class="text-slate-900">Cardiovascular:</strong> Irregularly irregular rhythm, S3 gallop, mild systolic murmur
+              </p>
+              <p>
+                <strong class="text-slate-900">Neurological:</strong> <span class="clinical-clue rounded px-1">Mild bilateral upper extremity tremor and hyperreflexia</span>
+              </p>
+            </div>
+            <div class="space-y-2">
+              <p>
+                <strong class="text-slate-900">Respiratory:</strong> Bibasilar crackles
+              </p>
+              <p>
+                <strong class="text-slate-900">Extremities:</strong> Pitting edema +2 bilaterally; 2×2 cm erythematous ulcer with purulent discharge on right plantar surface
+              </p>
+              <p>
+                <strong class="text-slate-900">HEENT:</strong> Mild jugular venous distension at 30° elevation, no thyromegaly or lymphadenopathy
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Laboratory Data / Imaging Box -->
+        <div class="border border-slate-200 rounded-xl p-5 mb-6 bg-white">
+          <div class="flex flex-wrap items-center justify-between pb-2.5 mb-3.5 border-b border-slate-100 gap-2">
+            <h3 class="text-sm sm:text-base font-bold text-[#1e3a8a]">
+              Laboratory Data / Imaging:
+            </h3>
+            <span class="text-xs text-slate-500">Cockcroft-Gault CrCl ≈ 12.4 mL/min (TBW) | 11.3 mL/min (IBW)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm sm:text-base text-slate-700 leading-relaxed">
+            <div class="space-y-2">
+              <p>
+                <strong class="text-slate-900">CBC:</strong> WBC 11,200 /μL / <span class="clinical-clue rounded px-1">Hb 10.5 g/dL / Plt 135,000 /μL</span>
+              </p>
+              <p>
+                <strong class="text-slate-900">BMP:</strong> Na 136, <span class="clinical-clue font-semibold text-rose-700 rounded px-1">K 5.8 mEq/L</span>, <span class="clinical-clue font-semibold text-rose-700 rounded px-1">BUN 76 mg/dL, Cr 5.5 mg/dL</span>, Glucose 158 mg/dL
+              </p>
+              <p>
+                <strong class="text-slate-900">HbA1c:</strong> 7.8% &nbsp;|&nbsp; <strong class="text-slate-900">Lactate:</strong> <span class="clinical-clue rounded px-1">2.4 mmol/L</span>
+              </p>
+            </div>
+            <div class="space-y-2">
+              <p><strong class="text-slate-900">INR:</strong> 1.2</p>
+              <p><strong class="text-slate-900">CXR:</strong> Cardiomegaly, pulmonary congestion</p>
+              <p><strong class="text-slate-900">EKG:</strong> Atrial fibrillation</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Medications List Box -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-200 gap-2">
+            <div>
+              <h3 class="text-base font-bold text-[#1e3a8a] flex items-center gap-2">
+                <i data-lucide="list-checks" class="w-5 h-5 text-blue-600"></i>
+                Current Medications (入院前門診與外院既有處方共 10 項):
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">請評估在 eGFR &lt; 25 mL/min/1.73m² (實測 eGFR 12) 且合併急性心衰竭與感染下之處方合理性</p>
+            </div>
+            <button onclick="switchTab('meds')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm self-start sm:self-auto no-print">
+              <span>前往逐項處方評估與測驗</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm">
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">1</span>
+              <span class="font-medium text-slate-800">Tramadol 37.5mg + Acetaminophen 325mg/tab <span class="text-blue-700 font-semibold">1# Q12H</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">2</span>
+              <span class="font-medium text-slate-800">Captopril 25 mg <span class="text-blue-700 font-semibold">QD</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">3</span>
+              <span class="font-medium text-slate-800">Furosemide 40 mg <span class="text-blue-700 font-semibold">QD</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">4</span>
+              <span class="font-medium text-slate-800">Atorvastatin 20 mg <span class="text-blue-700 font-semibold">QHS</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">5</span>
+              <span class="font-medium text-slate-800">Dabigatran 150 mg <span class="text-blue-700 font-semibold">BID</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">6</span>
+              <span class="font-medium text-slate-800">Metformin 500 mg <span class="text-blue-700 font-semibold">BID</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">7</span>
+              <span class="font-medium text-slate-800">Amlodipine 5 mg <span class="text-blue-700 font-semibold">QD</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">8</span>
+              <span class="font-medium text-slate-800">Famotidine 20 mg <span class="text-blue-700 font-semibold">BID</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">9</span>
+              <span class="font-medium text-slate-800">Linezolid 600 mg <span class="text-blue-700 font-semibold">Q12H</span></span>
+            </div>
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200">
+              <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0">10</span>
+              <span class="font-medium text-slate-800">Dapagliflozin 10 mg <span class="text-blue-700 font-semibold">QD</span> <span class="text-xs text-slate-500 font-normal">(已穩定使用近 5 年)</span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: INTERACTIVE 10 MEDICATIONS REVIEW   -->
+    <!-- ========================================== -->
+    <section id="tab-meds" class="tab-panel hidden space-y-6">
+      
+      <!-- Control Bar: Filter & Quiz Score -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 case-paper-shadow">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="check-square" class="w-5 h-5 text-blue-600"></i>
+              <span>10 項既有處方之臨床藥事評估 (eGFR 12 mL/min/1.73m²)</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              可針對每項藥物選擇您的「臨床處置決策」，或直接點擊「展開實證解析」查看 TFDA/FDA 仿單、KDIGO 指引與 Lexicomp 依據。
+            </p>
+          </div>
+
+          <!-- Score & Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div id="quiz-score-badge" class="px-3.5 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700">
+              作答進度: <span id="answered-count" class="text-blue-600">0</span>/10 題
+            </div>
+            <button onclick="checkAllQuizAnswers()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm flex items-center gap-1.5">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              <span>批改全數決策並顯示解析</span>
+            </button>
+            <button onclick="resetQuiz()" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+              重置練習
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-slate-100">
+          <span class="text-xs font-semibold text-slate-400 mr-1">風險分類篩選:</span>
+          <button onclick="filterMedCards('all')" data-filter="all" class="med-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 text-white">
+            全部藥品 (10)
+          </button>
+          <button onclick="filterMedCards('stop')" data-filter="stop" class="med-filter-btn px-3 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+            🔴 立即停用 / 絕對禁忌 (3)
+          </button>
+          <button onclick="filterMedCards('hold')" data-filter="hold" class="med-filter-btn px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100">
+            🟠 急性期暫停 Hold (2)
+          </button>
+          <button onclick="filterMedCards('adjust')" data-filter="adjust" class="med-filter-btn px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100">
+            🟡 調整劑量或途徑 (2)
+          </button>
+          <button onclick="filterMedCards('continue')" data-filter="continue" class="med-filter-btn px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">
+            🟢 繼續使用 / 密切監測 (3)
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic 10 Medication Cards Container -->
+      <div id="medications-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Populated by JavaScript -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: EVIDENCE MATRIX & RENAL CALCULATOR  -->
+    <!-- ========================================== -->
+    <section id="tab-matrix" class="tab-panel hidden space-y-6">
+      
+      <!-- Interactive Renal Function & CrCl Calculator -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 case-paper-shadow">
+        <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-5 border-b border-slate-200 gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="calculator" class="w-5 h-5 text-blue-600"></i>
+              <span>臨床腎功能動態計算機 (Cockcroft-Gault CrCl vs. eGFR)</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              藥品仿單多數依據 Cockcroft-Gault (mL/min) 制定劑量調整標準，而 KDIGO 指引則常採用 CKD-EPI eGFR (mL/min/1.73m²)。可調整參數進行教學模擬：
+            </p>
+          </div>
+          <button onclick="resetCalculatorToJobs()" class="self-start md:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
+            還原 Mr. Jobs 數值 (72歲 / 72kg / Cr 5.5)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Inputs -->
+          <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-500 mb-1">年齡 Age (yrs)</label>
+              <input type="number" id="calc-age" value="72" min="18" max="110" oninput="updateRenalCalc()" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-bold text-slate-800" />
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-500 mb-1">體重 Weight (kg)</label>
+              <input type="number" id="calc-wt" value="72" min="30" max="200" oninput="updateRenalCalc()" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-bold text-slate-800" />
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-500 mb-1">身高 Height (cm)</label>
+              <input type="number" id="calc-ht" value="170" min="120" max="220" oninput="updateRenalCalc()" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-bold text-slate-800" />
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <label class="block text-xs font-semibold text-slate-500 mb-1">Serum Cr (mg/dL)</label>
+              <input type="number" id="calc-scr" value="5.5" step="0.1" min="0.4" max="15" oninput="updateRenalCalc()" class="w-full px-2.5 py-1.5 bg-white border border-rose-300 rounded-lg text-sm font-bold text-rose-700" />
+            </div>
+          </div>
+
+          <!-- Calculated Output Cards -->
+          <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3.5">
+              <div class="text-xs font-semibold text-blue-800">CG CrCl (實際體重 TBW)</div>
+              <div class="text-2xl font-extrabold text-blue-900 mt-1">
+                <span id="calc-res-tbw">12.4</span> <span class="text-xs font-normal">mL/min</span>
+              </div>
+              <div class="text-[11px] text-blue-700 mt-1 font-mono" id="calc-formula-tbw">
+                [(140-72)×72] / (72×5.5)
+              </div>
+            </div>
+            <div class="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3.5">
+              <div class="text-xs font-semibold text-indigo-800">CG CrCl (理想體重 IBW)</div>
+              <div class="text-2xl font-extrabold text-indigo-900 mt-1">
+                <span id="calc-res-ibw">11.3</span> <span class="text-xs font-normal">mL/min</span>
+              </div>
+              <div class="text-[11px] text-indigo-700 mt-1" id="calc-ibw-note">
+                IBW: 66.0 kg | 伴隨下肢水腫(+2)宜參考乾體重/IBW
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Summary Table of All 10 Drugs -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 case-paper-shadow overflow-hidden">
+        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i data-lucide="table-2" class="w-5 h-5 text-blue-600"></i>
+          <span>10 項處方藥品之腎功能門檻與臨床處置實證總表</span>
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                <th class="py-3 px-3 font-bold">#</th>
+                <th class="py-3 px-3 font-bold">目前處方藥品</th>
+                <th class="py-3 px-3 font-bold">臨床對應適應症</th>
+                <th class="py-3 px-3 font-bold">腎功能門檻 / 關鍵限制</th>
+                <th class="py-3 px-3 font-bold">建議臨床決策</th>
+                <th class="py-3 px-3 font-bold">實證指引依據</th>
+              </tr>
+            </thead>
+            <tbody id="summary-table-body" class="divide-y divide-slate-200 text-slate-700">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: SOAP NOTE & PGY DISCUSSION QUESTIONS -->
+    <!-- ========================================== -->
+    <section id="tab-soap" class="tab-panel hidden space-y-6">
+      
+      <!-- SOAP Note Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 case-paper-shadow">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-slate-200 gap-3">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="file-check-2" class="w-5 h-5 text-blue-600"></i>
+              <span>臨床藥師標準 SOAP 藥事照護紀錄</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              已整合本案 10 項藥品之 DRP 評估、劑量轉換建議與後續生化/血球監測計畫。
+            </p>
+          </div>
+          <div class="flex items-center gap-2 no-print">
+            <button onclick="copySoapNote()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="copy-btn-text">一鍵複製 SOAP 全文</span>
+            </button>
+            <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition border border-slate-300">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>列印 / 匯出 PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="soap-content-area" class="space-y-5 text-sm leading-relaxed text-slate-800">
+          <!-- Subjective -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 text-base mb-1.5 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-blue-700 text-white text-xs flex items-center justify-center font-bold">S</span>
+              <span>Subjective (主觀資料)</span>
+            </div>
+            <p>
+              72 歲男性 (170 cm, 72 kg)，主訴：「醫師，我呼吸很喘、雙腳水腫，而且右腳傷口非常痛。另外，我的 <strong>Dapagliflozin 已經吃快 5 年了</strong>，現在還能繼續吃嗎？」（近兩週呼吸困難漸進性惡化，活動時加劇，伴隨端坐呼吸 orthopnea、陣發性夜間呼吸困難 PND 及雙下肢水腫）。病患過去因 T2DM、HFrEF 與 CKD，於近 5 年前（當時 eGFR &gt; 25 mL/min/1.73m²）開始規則服用 Dapagliflozin 10 mg QD。10 天前右足底出現糖尿病足潰瘍且疼痛劇烈，5 天前外院門診傷口培養出 MRSA，開始口服 Linezolid 600 mg Q12H 與 Tramadol 37.5mg/Acetaminophen 325mg 1# Q12H。近 24 小時出現輕微躁動不安、雙手顫抖 (hand tremors) 與尿量減少。否認胸痛或咳嗽。
+            </p>
+          </div>
+
+          <!-- Objective -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 text-base mb-1.5 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-blue-700 text-white text-xs flex items-center justify-center font-bold">O</span>
+              <span>Objective (客觀資料)</span>
+            </div>
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>過去病史：</strong>HTN (20 yrs)、T2DM (15 yrs)、HFrEF、CKD stage 5 (baseline eGFR 18，未透析)、Non-valvular AF、Dyslipidemia、PUD、CABG (8 yrs ago)。</li>
+              <li><strong>生命徵象與理學檢查：</strong>BP 160/90 mmHg, HR 98 bpm (irregular), RR 24, Temp 37.6°C, SpO₂ 90% (RA)；JVD (+)、S3 gallop、雙側肺底囉音 (bibasilar crackles)、雙下肢凹陷性水腫 (+2)、右足底 2×2 cm 化膿性紅腫潰瘍；神經學檢查顯示雙上肢輕微顫抖與反射亢進 (hyperreflexia)。</li>
+              <li><strong>檢驗與影像：</strong>WBC 11,200 /μL, Hb 10.5 g/dL, Plt 135,000 /μL; Na 136, <strong>K 5.8 mEq/L (↑)</strong>, <strong>BUN 76 mg/dL, Cr 5.5 mg/dL (eGFR ≈ 12 mL/min/1.73m², CG CrCl ≈ 12.4 mL/min)</strong>, Glucose 158 mg/dL, HbA1c 7.8%, INR 1.2, <strong>Lactate 2.4 mmol/L (↑)</strong>。CXR 顯示心臟擴大與肺充血；EKG 為心房顫動。</li>
+            </ul>
+          </div>
+
+          <!-- Assessment -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 text-base mb-2 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-blue-700 text-white text-xs flex items-center justify-center font-bold">A</span>
+              <span>Assessment (藥物治療問題評估 DRPs)</span>
+            </div>
+            <ol class="list-decimal list-inside space-y-2">
+              <li><strong>嚴重藥物交互作用與血清素症候群 (Linezolid + Tramadol)：</strong>Linezolid 具可逆性非選擇性 MAOI 活性，與 Tramadol 併用屬 Lexicomp X 級禁忌交互作用。病患已出現躁動、手抖、反射亢進與微熱 (37.6°C) 等早期血清素症候群表現，且 CrCl &lt; 30 mL/min 會使 Tramadol 活性代謝物蓄積。</li>
+              <li><strong>重度腎不全之絕對禁忌用藥 (Metformin &amp; Dabigatran)：</strong>
+                <ul class="list-disc list-inside ml-5 mt-1 space-y-1 text-slate-700">
+                  <li><strong>Metformin 500 mg BID：</strong>eGFR 12 mL/min/1.73m² (&lt; 30 為絕對禁忌)，且合併急性心衰竭低血氧 (SpO₂ 90%) 與 Lactate 2.4 mmol/L，具極高乳酸中毒風險。</li>
+                  <li><strong>Dabigatran 150 mg BID：</strong>約 80% 經腎排除，TFDA 仿單明定 CrCl &lt; 30 mL/min 為禁忌症（美國 FDA 於 CrCl &lt; 15 mL/min 亦不建議使用），繼續服用 150 mg BID 具致命性出血高風險。</li>
+                </ul>
+              </li>
+              <li><strong>急性失代償心衰竭 (ADHF) 合併 AKI on CKD 與高血鉀 (K 5.8 mEq/L)：</strong>
+                <ul class="list-disc list-inside ml-5 mt-1 space-y-1 text-slate-700">
+                  <li><strong>Captopril 25 mg QD：</strong>ACEI 於 AKI 與 K 5.8 mEq/L 時會惡化高血鉀與腎絲球過濾壓下降；且 Captopril 為短效藥，開立 QD 頻次不當。</li>
+                  <li><strong>Furosemide 40 mg QD PO：</strong>ADHF 腸道水腫影響口服吸收且 eGFR 12 具顯著利尿劑阻抗，目前口服劑量無法緩解肺水腫與排鉀。</li>
+                  <li><strong>Dapagliflozin 10 mg QD（已使用近 5 年）：</strong>依據 TFDA/FDA 仿單、KDIGO 2024 指引與 DAPA-CKD/DAPA-HF 試驗，雖然 eGFR &lt; 25 mL/min/1.73m² 不建議「新起始」，但<strong>病患已穩定服用近 5 年，慢性期可合法續用 10 mg QD 直至進入透析</strong>以維持心腎保護。惟目前處於急性失代償心衰竭 (ADHF)、AKI on CKD (Cr 5.5, eGFR 12) 與急性 MRSA 足部感染期（Lactate 2.4 mmol/L），急性期應評估血行動力學與容積狀態，建議暫停 (Hold) 以避免混淆腎功能判讀與預防正常血糖酮酸中毒 (euDKA)，待急性期穩定後即可恢復續用。</li>
+                </ul>
+              </li>
+              <li><strong>腎功能劑量過高與骨髓抑制風險 (Famotidine &amp; Linezolid)：</strong>
+                <ul class="list-disc list-inside ml-5 mt-1 space-y-1 text-slate-700">
+                  <li><strong>Famotidine 20 mg BID：</strong>CrCl &lt; 30 mL/min 半衰期延長至 &gt; 20 小時，過量易致中樞神經混亂/譫妄，需減半劑量。</li>
+                  <li><strong>Linezolid 600 mg Q12H：</strong>雖原型藥不需調整劑量，但重度腎不全患者代謝物蓄積 7-8 倍，極易引發血小板低下 (目前 Plt 135k 已偏低) 與貧血 (Hb 10.5)。</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Plan -->
+          <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200">
+            <div class="font-bold text-blue-900 text-base mb-2 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-blue-700 text-white text-xs flex items-center justify-center font-bold">P</span>
+              <span>Plan (具體藥事照護建議與監測計畫)</span>
+            </div>
+            <ul class="list-disc list-inside space-y-1.5">
+              <li><strong>立即停用 (DC)：</strong>
+                <span class="text-rose-700 font-semibold">Metformin 500 mg BID</span>（改用 Linagliptin 5 mg QD 或短效 Insulin 控制血糖）；
+                <span class="text-rose-700 font-semibold">Dabigatran 150 mg BID</span>（停藥至少 2-3 天待藥物清除並確認無出血後，評估改為 Apixaban 2.5 mg BID 或 Warfarin）；
+                <span class="text-rose-700 font-semibold">Tramadol/Acetaminophen 1# Q12H</span>（改為單方 Acetaminophen 500 mg PO Q6H-Q8H PRN 止痛，觀察手抖與反射亢進是否於 24-48 小時內消退）。
+              </li>
+              <li><strong>急性期暫停 (Hold)：</strong>
+                暫停 <span class="text-orange-700 font-semibold">Captopril 25 mg QD</span> 與 <span class="text-orange-700 font-semibold">Dapagliflozin 10 mg QD</span>。向病患衛教說明：「因為您已經服用 Dapagliflozin 快 5 年，慢性期即使腎功能低於 25 仍可繼續使用保護心臟與腎臟；但因目前正逢急性腎損傷與足部細菌感染住院，先暫停幾天，等感染與腎功能穩定後即可恢復服用。」先執行急性降血鉀處置，待血行動力學、腎功能與血鉀 (&lt; 5.0 mEq/L) 穩定後再重新評估復藥。
+              </li>
+              <li><strong>調整劑量與給藥途徑 (Adjust)：</strong>
+                將口服 Furosemide 改為靜脈注射 <span class="text-blue-800 font-semibold">Furosemide IV 40–80 mg Q12H</span>（依每小時尿量與肺部囉音調整），以迅速改善肺水腫並促進鉀離子排泄；將 <span class="text-blue-800 font-semibold">Famotidine 調降為 20 mg QD</span>。
+              </li>
+              <li><strong>繼續使用並密切監測 (Continue &amp; Monitor)：</strong>
+                維持 <span class="text-emerald-800 font-semibold">Atorvastatin 20 mg QHS</span> 與 <span class="text-emerald-800 font-semibold">Amlodipine 5 mg QD</span>（注意下肢水腫變化）；繼續 <span class="text-amber-800 font-semibold">Linezolid 600 mg Q12H</span> 治療 MRSA 足部感染，但須每 2–3 天追蹤 CBC/Plt（若 Plt &lt; 100,000 /μL 建議會診感染科評估換藥）。</li>
+              <li><strong>追蹤指標：</strong>每日監測 I/O、體重、微血管血氧 (SpO₂)、SCr、BUN、K⁺、Na⁺、血糖與神經學症狀 (Tremor/Clonus)；每 2–3 天追蹤 CBC 與 Lactate。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PGY Discussion Questions Accordion -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-7 case-paper-shadow">
+        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i data-lucide="messages-square" class="w-5 h-5 text-blue-600"></i>
+          <span>PGY 藥師 / 實習生臨床討論引導題 (附詳解)</span>
+        </h3>
+        <div class="space-y-3" id="pgy-qa-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Toast Notification for Clipboard -->
+  <div id="toast-notification" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg border border-slate-700 flex items-center gap-2.5 text-sm">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+    <span id="toast-message">已成功複製到剪貼簿！</span>
+  </div>
+
+  <!-- Footer with Version & Creation Date -->
+  <footer class="bg-white border-t border-slate-200 mt-12 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-slate-700">臨床藥事照護案例討論互動教學系統</span>
+        <span>— Case 1: Mr. Jobs (eGFR &lt; 25 mL/min/1.73m²)</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 font-semibold border border-blue-200">
+          史一良藥師監製 / 臨床藥學教案系統
+        </span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200">
+          版本號: <strong>v1.1.0</strong>
+        </span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200">
+          製作日期: <strong>2026-11-17</strong>
+        </span>
+        <span class="text-slate-400">參考依據: TFDA/FDA 仿單、KDIGO 2024、Lexicomp</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic & Clinical Data -->
+  <script>
+    // =========================================================================
+    // 1. CLINICAL MEDICATION DATA (10 Drugs with Evidence-Based DRP Analysis)
+    // =========================================================================
+    const medicationsData = [
+      {
+        id: 1,
+        name: "Tramadol 37.5mg + Acetaminophen 325mg/tab",
+        regimen: "1# PO Q12H",
+        indication: "糖尿病足潰瘍傷口疼痛 (Diabetic foot ulcer pain)",
+        category: "stop", // stop | hold | adjust | continue
+        correctAction: "stop",
+        actionLabel: "🔴 立即停用並轉換 (Stop & Switch)",
+        drpType: "嚴重藥物交互作用 (Lexicomp X 級) + 腎不全代謝物蓄積",
+        renalThreshold: "CrCl < 30 mL/min：Tramadol 活性代謝物 M1 排泄延長；且與 Linezolid 併用為絕對禁忌",
+        mechanism: "Linezolid 為可逆性、非選擇性單胺氧化酶抑制劑 (MAOI)，與具血清素回收抑制作用之 Tramadol 併用屬於 Lexicomp X 級（避免併用）交互作用，極易誘發危及生命之「血清素症候群 (Serotonin Syndrome)」。病患近 24 小時已出現躁動不安、雙手顫抖 (tremor) 與反射亢進 (hyperreflexia) 等典型早期徵兆。",
+        recommendation: "立即停用 Tramadol/Acetaminophen 複方錠，改為單方 Acetaminophen 500 mg PO Q6H–Q8H PRN（總日劑量不超過 2,000–3,000 mg），並密切觀察神經學症狀是否消退。",
+        guidelineRef: "Lexicomp Drug Interactions (Rating X); TFDA/FDA Ultracet® 仿單"
+      },
+      {
+        id: 2,
+        name: "Captopril 25 mg",
+        regimen: "1# PO QD",
+        indication: "高血壓 / 心衰竭 (HTN / HFrEF)",
+        category: "hold",
+        correctAction: "hold",
+        actionLabel: "🟠 急性期暫停使用 (Hold)",
+        drpType: "嚴重不良反應 (高血鉀 K 5.8 + AKI on CKD) & 給藥頻次不當",
+        renalThreshold: "K > 5.5 mEq/L 或急性腎損傷 (AKI) 時應暫停；CrCl 10–50 mL/min 建議減量至 75% 且每 12–18 小時給藥",
+        mechanism: "1. 病患目前血鉀高達 5.8 mEq/L 且 SCr 升至 5.5 mg/dL (AKI on CKD stage 5)，Captopril (ACEI) 會抑制醛固酮分泌並擴張出球小動脈，持續用藥會加劇致命性高血鉀與腎絲球過濾壓下降。\n2. Captopril 為短效型 ACEI（排除半衰期約 2 小時，腎不全時延長），標準頻次為 BID–TID，開立 QD 無法提供 24 小時穩定血液動力學覆蓋。",
+        recommendation: "住院急性期立即暫停 (Hold) Captopril，優先處理高血鉀與急性心衰竭；待腎功能與血鉀 (< 5.0 mEq/L) 穩定後，再評估是否轉換為長效且具心衰竭實證之藥物。",
+        guidelineRef: "KDIGO 2024 CKD Guideline; AHA/ACC/HFSA Heart Failure Guideline"
+      },
+      {
+        id: 3,
+        name: "Furosemide 40 mg",
+        regimen: "1# PO QD",
+        indication: "心衰竭與慢性腎病體液滯留 (ADHF / Volume Overload)",
+        category: "adjust",
+        correctAction: "adjust",
+        actionLabel: "🟡 改為靜脈注射並調升劑量 (Switch to IV & Escalate)",
+        drpType: "劑量不足 / 給藥途徑不適當 (Subtherapeutic dosage & Improper route)",
+        renalThreshold: "eGFR 12 mL/min/1.73m² 存在顯著亨利氏環利尿劑阻抗 (Diuretic resistance)",
+        mechanism: "病患因急性失代償心衰竭 (ADHF) 出現肺充血、雙側肺底囉音、低血氧 (SpO₂ 90%) 與雙下肢水腫 (+2)。在 ADHF 狀態下，腸道黏膜水腫會大幅延遲並減少口服 Furosemide 吸收（生體可用率約 50% 且變異大）；加上 eGFR 僅 12 mL/min/1.73m²，內源性有機酸與尿毒分子會競爭腎小管 OAT 轉運蛋白，使分泌至管腔作用部位的利尿劑大幅減少。",
+        recommendation: "停用口服劑型，改為靜脈注射 Furosemide IV 40–80 mg Q12H（約居家口服劑量之 1–2.5 倍起始），依尿量反應調整，兼具解除肺水腫與促進腎臟排鉀 (治療 K 5.8) 之雙重效益。",
+        guidelineRef: "2022 AHA/ACC/HFSA Heart Failure Guideline; DOSE Trial"
+      },
+      {
+        id: 4,
+        name: "Atorvastatin 20 mg",
+        regimen: "1# PO QHS",
+        indication: "血脂異常與冠狀動脈繞道手術次級預防 (Dyslipidemia / Post-CABG)",
+        category: "continue",
+        correctAction: "continue",
+        actionLabel: "🟢 繼續使用 (Continue)",
+        drpType: "處方合理 (Appropriate therapy - 無需調整腎功能劑量)",
+        renalThreshold: "經肝臟 CYP3A4 代謝並由膽汁排泄，腎臟排泄 < 2%，eGFR < 25 無需調整劑量",
+        mechanism: "Atorvastatin 不經由腎臟清除，於重度慢性腎臟病 (Stage 4–5) 患者不需調降劑量。病患具 CABG 冠狀動脈繞道手術病史（ASCVD 極高風險群），且尚未進入透析。",
+        recommendation: "繼續維持 Atorvastatin 20 mg QHS 口服使用，提供持續之心血管事件次級預防保護。",
+        guidelineRef: "KDIGO Lipid Management in CKD Guideline; SHARP Trial"
+      },
+      {
+        id: 5,
+        name: "Dabigatran 150 mg",
+        regimen: "1# PO BID",
+        indication: "非瓣膜性心房顫動中風預防 (Non-valvular AF stroke prevention)",
+        category: "stop",
+        correctAction: "stop",
+        actionLabel: "🔴 立即停用並評估轉換 (Contraindicated / Stop)",
+        drpType: "絕對禁忌症 / 腎臟排泄受阻致嚴重出血風險",
+        renalThreshold: "台灣 TFDA 與歐洲 EMA：CrCl < 30 mL/min 為絕對禁忌；美國 FDA：CrCl < 15 mL/min 不建議使用",
+        mechanism: "Dabigatran 高達 80% 由腎臟原型排泄，是所有 DOACs 中腎臟依賴度最高者。在 CrCl 12.4 mL/min 的重度腎衰竭患者體內，藥物暴露量 (AUC) 會暴增 6 倍以上，半衰期由 12–14 小時延長至 27–34 小時以上，加上病患曾有消化性潰瘍病史 (PUD)，持續使用 150 mg BID 極易引發致命性消化道或顱內出血。",
+        recommendation: "立即停用 Dabigatran！考量半衰期顯著延長，應停藥觀察至少 48–72 小時並確認無出血徵兆後，改用經肝代謝比例較高、可於重度腎不全調整劑量之 Apixaban (如 2.5 mg BID) 或 Warfarin (維持 INR 2.0–3.0)。",
+        guidelineRef: "TFDA Pradaxa® 仿單; 2023 ACC/AHA/ACCP/HRS AF Guideline"
+      },
+      {
+        id: 6,
+        name: "Metformin 500 mg",
+        regimen: "1# PO BID",
+        indication: "第二型糖尿病 (Type 2 Diabetes Mellitus)",
+        category: "stop",
+        correctAction: "stop",
+        actionLabel: "🔴 立即停用 (Contraindicated / Stop)",
+        drpType: "絕對禁忌症 (Metformin-Associated Lactic Acidosis, MALA 高風險)",
+        renalThreshold: "eGFR < 30 mL/min/1.73m² 為絕對使用禁忌 (Contraindicated)",
+        mechanism: "Metformin 100% 以原型由腎絲球過濾與腎小管分泌排除。當 eGFR < 30 mL/min/1.73m² 時藥物大量蓄積，抑制肝臟粒線體呼吸鏈並阻礙乳酸糖質新生。本案例 eGFR 僅 12 mL/min/1.73m²，且同時合併急性失代償心衰竭組織低灌流與低血氧 (SpO₂ 90%)，血中乳酸已上升至 2.4 mmol/L，隨時可能惡化為致死率極高之乳酸中毒 (MALA)。",
+        recommendation: "立即永久停用 (DC) Metformin！住院期間可改用無需調整腎功能劑量之 DPP-4 抑制劑 (如 Linagliptin 5 mg QD) 或短效/基礎胰島素 (Insulin) 調控血糖。",
+        guidelineRef: "TFDA/FDA Metformin 仿單; ADA 2026 Standards of Care; KDIGO 2022 Diabetes in CKD"
+      },
+      {
+        id: 7,
+        name: "Amlodipine 5 mg",
+        regimen: "1# PO QD",
+        indication: "高血壓 (Hypertension)",
+        category: "continue",
+        correctAction: "continue",
+        actionLabel: "🟢 繼續使用並監測水腫 (Continue & Monitor)",
+        drpType: "腎功能無需調整劑量 (需評估周邊水腫影響)",
+        renalThreshold: "90% 經肝臟代謝為無活性代謝物，eGFR < 25 mL/min/1.73m² 無需調整劑量",
+        mechanism: "Amlodipine 藥動學不受腎功能不全影響，且目前病患血壓為 160/90 mmHg（由於 Captopril 需因高血鉀與 AKI 暫停，保留 Amlodipine 有助於維持血壓控制）。此外，根據 PRAISE 臨床試驗，Amlodipine 對 HFrEF 患者不具負性肌力作用，不會增加心衰竭死亡率。",
+        recommendation: "可繼續使用 Amlodipine 5 mg QD 控制血壓；惟二氫吡啶類 CCB 可能引起微血管前小動脈擴張性水腫，需配合靜脈利尿劑治療並觀察雙下肢水腫消退情形。",
+        guidelineRef: "PRAISE Trial; Lexicomp Renal Dosing Database"
+      },
+      {
+        id: 8,
+        name: "Famotidine 20 mg",
+        regimen: "1# PO BID",
+        indication: "消化性潰瘍病史胃酸抑制 (Peptic ulcer disease prophylaxis/treatment)",
+        category: "adjust",
+        correctAction: "adjust",
+        actionLabel: "🟡 調降腎功能劑量 (Renal Dose Reduction)",
+        drpType: "劑量過高 (Overdosage in Severe Renal Impairment)",
+        renalThreshold: "CrCl < 30 mL/min (或 < 50 mL/min)：建議調降 50% 劑量或延長給藥間隔",
+        mechanism: "Famotidine 約 65–70% 經由腎臟原型排泄。在重度腎功能不全 (CrCl 12.4 mL/min) 患者中，排除半衰期會由正常的 2.5–4 小時顯著延長至 20 小時以上。若維持 20 mg BID 高劑量，藥物穿透血腦障壁蓄積會引發老年人中樞神經系統不良反應（如躁動、混亂、譫妄、幻覺），亦可能加重本案病患目前的躁動表現。",
+        recommendation: "將 Famotidine 劑量減半調整為 20 mg PO QD（或 10 mg QD / 20 mg QOD），或視臨床需要改為不需調整腎功能劑量之 PPI (如 Esomeprazole 或 Lansoprazole)。",
+        guidelineRef: "TFDA/FDA Pepcid® (Famotidine) 仿單; Lexicomp Geriatric & Renal Dosing"
+      },
+      {
+        id: 9,
+        name: "Linezolid 600 mg",
+        regimen: "1# PO Q12H",
+        indication: "糖尿病足潰瘍 MRSA 感染 (Diabetic foot infection - MRSA)",
+        category: "continue",
+        correctAction: "continue",
+        actionLabel: "🟢 繼續使用並密集監測血球 (Continue & Intensive Monitor)",
+        drpType: "重度腎不全代謝物蓄積致血小板低下風險 + MAOI 交互作用",
+        renalThreshold: "仿單表定不需調整原型藥起始劑量；但 eGFR < 30 時兩大代謝物蓄積 7–8 倍",
+        mechanism: "1. Linezolid 口服生體可用率達 100%，對 MRSA 具優異組織穿透力，仿單載明原型藥物清除率不隨腎功能改變。\n2. 然而多項臨床藥動學研究證實，在 CrCl < 30 mL/min 患者體內，兩種主要氧化代謝物 (PNU-142300 與 PNU-142586) 會蓄積達正常腎功能者的 7–8 倍，使「血小板低下 (Thrombocytopenia)」與貧血風險顯著倍增！病患用藥 5 天後 Plt 已降至 135,000 /μL、Hb 10.5 g/dL。",
+        recommendation: "在停用 Tramadol 解除交互作用的前提下，可繼續使用 Linezolid 600 mg Q12H 治療 MRSA 感染，但必須每 2–3 天密切追蹤 CBC 與血小板。若血小板持續下降 (< 100,000 /μL) 或療程需超過 10–14 天，應與感染科討論轉換為其他抗 MRSA 藥物。",
+        guidelineRef: "TFDA/FDA Zyvox® 仿單; Journal of Antimicrobial Chemotherapy (Renal Linezolid PK Studies)"
+      },
+      {
+        id: 10,
+        name: "Dapagliflozin 10 mg (已使用近 5 年)",
+        regimen: "1# PO QD",
+        indication: "心衰竭與慢性腎臟病器官保護 (HFrEF & CKD progression protection，已穩定服用近 5 年)",
+        category: "hold",
+        correctAction: "hold",
+        actionLabel: "🟠 急性期暫停，穩定後可續用至透析 (Hold in Acute Phase, Resume Chronically)",
+        drpType: "eGFR < 25「已使用近 5 年可續用至透析」vs.「急性感染/AKI 期 Sick-day Rule 暫停」",
+        renalThreshold: "eGFR < 25 mL/min/1.73m²：不建議「新起始」，但本案已穩定使用近 5 年，慢性期可續用至透析",
+        mechanism: "1. 【慢性期續用實證】：病患於主訴特別詢問「Dapagliflozin 已經吃快 5 年了還能繼續吃嗎？」。根據 DAPA-CKD 試驗、TFDA/FDA 仿單與 KDIGO 2024 指引，雖然 eGFR < 25 mL/min/1.73m² 不建議「新開立 (Initiation)」，但因為病患在近 5 年前（eGFR > 25 時）即已開始服用，慢性期可合法續用 10 mg QD 直至進入透析，以維持心腎保護效益。\n2. 【急性期處置評估】：然而目前病患發生 AKI on CKD (eGFR 由 18 驟降至 12, Cr 5.5)、急性失代償心衰竭 (ADHF) 須高劑量靜脈利尿劑治療，且合併糖尿病足急性 MRSA 感染與乳酸微升 (2.4 mmol/L)。在急性感染症與 AKI 住院期間持續使用 SGLT2i，可能干擾體液容積與腎功能恢復之判讀，並增加正常血糖糖尿病酮酸中毒 (euDKA) 風險。",
+        recommendation: "向病患衛教肯定其過去 5 年用藥的保護效益；但於本次住院急性期（AKI + ADHF + 急性感染）建議依 Sick-day rule 暫時停藥 (Hold) 或極審慎監測。待急性感染控制、血行動力學與腎功能回穩且穩定進食後，即可恢復 Dapagliflozin 10 mg QD 續用至透析。",
+        guidelineRef: "KDIGO 2024 CKD Guideline; DAPA-CKD & DAPA-HF Trials; TFDA Forxiga® 仿單"
+      }
+    ];
+
+    // =========================================================================
+    // 2. PGY DISCUSSION QUESTIONS DATA
+    // =========================================================================
+    const pgyQuestions = [
+      {
+        q: "Q1. 為什麼病患在急診出現「雙手顫抖 (hand tremors)、反射亢進 (hyperreflexia)、微熱 (37.6°C) 與躁動不安」？應如何處置？",
+        a: "這是典型的「血清素症候群 (Serotonin Syndrome)」早期臨床表現（Hunter Serotonin Toxicity Criteria 包含顫抖、反射亢進、肌陣攣、躁動與體溫升高）。成因是門診 5 天前同時開立了 Linezolid（具可逆性非選擇性 MAOI 作用，抑制血清素分解）與 Tramadol（抑制突觸前血清素回收），加上病患 CrCl 僅 12.4 mL/min 導致 Tramadol 蓄積。處置上應立即停用 Tramadol/Acetaminophen，改用單方 Acetaminophen 止痛，多數輕中度症狀在停藥後 24–48 小時內會緩解。"
+      },
+      {
+        q: "Q2. 根據仿單，Linezolid 在腎功能不全時「不需調整劑量」，為何臨床藥師仍需特別警示血小板低下風險？",
+        a: "雖然 Linezolid 原型藥約 70% 經非腎臟途徑代謝，原型藥血中濃度在腎衰竭患者未顯著上升，但近 10 年臨床藥動學研究（如 Crass et al., J Antimicrob Chemother）證實，Linezolid 的兩個主要胺基乙氧基乙酸代謝物（PNU-142300 與 PNU-142586）高度依賴腎臟排泄，在 eGFR < 30 mL/min/1.73m² 時會蓄積 7–8 倍，導致骨髓抑制（特別是血小板低下與貧血）發生率高達 30–50%。本案例病患 Plt 已偏低 (135,000 /μL)，必須每 2–3 天追蹤 CBC。"
+      },
+      {
+        q: "Q3. 針對本案例的非瓣膜性心房顫動 (AF)，停用 Dabigatran 150 mg BID 後，若欲轉換為其他口服抗凝血劑，實證上有哪些選擇？",
+        a: "Dabigatran 在 CrCl < 30 mL/min 為台灣 TFDA 仿單禁忌症。停藥並等待 48–72 小時讓蓄積藥物代謝排除後，可考慮：\n1. Apixaban：腎臟排泄比例僅約 27%，為 DOACs 中最低。若病患同時符合「年齡 ≥ 80 歲、體重 ≤ 60 kg、SCr ≥ 1.5 mg/dL」其中兩項則使用 2.5 mg BID（本例病患 72 歲、72 kg、SCr 5.5，雖僅符合 1 項，但在 CrCl < 15 mL/min 實務上常審慎評估出血風險或改用 Warfarin）。\n2. Warfarin：完全經肝臟 CYP2C9 代謝，不受腎功能限制，惟須密切監測 INR 維持於 2.0–3.0。"
+      },
+      {
+        q: "Q4. 病患在主訴中特別問到：「我的 Dapagliflozin 已經吃快 5 年了，現在還能繼續吃嗎？」請比較 Metformin 與已長期使用之 Dapagliflozin 在 eGFR < 25 mL/min/1.73m² 時的臨床指引差異與衛教回應。",
+        a: "1. Metformin：當 eGFR < 30 mL/min/1.73m² 時為「絕對使用禁忌」，不論過去吃了幾年都必須立即永久停藥 (DC)，以避免致死性乳酸中毒 (MALA)。\n2. Dapagliflozin（已使用近 5 年）：根據 KDIGO 2024 指引、TFDA/FDA 仿單與 DAPA-CKD 試驗，當 eGFR < 25 mL/min/1.73m² 時雖「不建議新起始 (Do not initiate)」，但本案病患在近 5 年前即已開始服用，慢性期「可繼續使用 10 mg QD 直至開始透析」，持續提供心衰竭與延緩腎功能惡化的保護力。\n3. 住院急性期決策與病患衛教：藥師應向病患說明，這顆藥慢性期可以繼續吃到透析前；但因為目前正處於急性腎損傷 (Cr 5.5, eGFR 12)、急性心衰竭肺水腫與右腳 MRSA 感染發炎期，依臨床『生病日法則 (Sick-day rule)』先暫停幾天，以避免脫水或正常血糖酮酸中毒 (euDKA)，等住院感染與腎功能穩定後即可恢復服用。"
+      }
+    ];
+
+    // =========================================================================
+    // 3. STATE MANAGEMENT & RENDER FUNCTIONS
+    // =========================================================================
+    let currentMode = 'student'; // 'student' | 'instructor'
+    let currentFilter = 'all';
+    let showClues = false;
+    let studentSelections = {}; // { medId: 'stop' | 'hold' | 'adjust' | 'continue' }
+    let revealedMeds = {};      // { medId: boolean }
+
+    function initApp() {
+      renderMedicationCards();
+      renderSummaryTable();
+      renderPgyQuestions();
+      updateRenalCalc();
+      lucide.createIcons();
+    }
+
+    // Switch Main Navigation Tabs
+    function switchTab(tabId) {
+      const tabs = ['case', 'meds', 'matrix', 'soap'];
+      tabs.forEach(t => {
+        const panel = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabId) {
+          panel.classList.remove('hidden');
+          btn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-600/20 text-blue-300 border border-blue-500/40 whitespace-nowrap";
+        } else {
+          panel.classList.add('hidden');
+          btn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 whitespace-nowrap";
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // Switch Student Quiz Mode vs Instructor Mode
+    function setTeachingMode(mode) {
+      currentMode = mode;
+      const btnStudent = document.getElementById('btn-mode-student');
+      const btnInstructor = document.getElementById('btn-mode-instructor');
+      const banner = document.getElementById('mode-status-banner');
+      const statusText = document.getElementById('mode-status-text');
+
+      if (mode === 'instructor') {
+        btnInstructor.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-emerald-600 text-white shadow";
+        btnStudent.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white";
+        banner.className = "mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print";
+        statusText.innerHTML = "目前為<strong>「教師指導模式」</strong>：已全數展開 10 項藥品之實證 DRP 解析、指引依據與病歷紅旗提示，方便課堂帶教討論。";
+        showClues = true;
+        applyClinicalCluesUI();
+        medicationsData.forEach(m => { revealedMeds[m.id] = true; });
+      } else {
+        btnStudent.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-blue-600 text-white shadow";
+        btnInstructor.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-300 hover:text-white";
+        banner.className = "mb-6 bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 no-print";
+        statusText.innerHTML = "目前為<strong>「學生測驗模式」</strong>：病歷中的異常提示與 10 項用藥之 DRP 實證解析已隱藏。請先閱讀病歷，再至「2. 處方評估與互動測驗」進行臨床決策練習！";
+        showClues = false;
+        applyClinicalCluesUI();
+        revealedMeds = {};
+      }
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    // Toggle Clinical Red Flag Clues on Tab 1
+    function toggleClinicalClues() {
+      showClues = !showClues;
+      applyClinicalCluesUI();
+    }
+
+    function applyClinicalCluesUI() {
+      const clues = document.querySelectorAll('.clinical-clue');
+      const btn = document.getElementById('btn-clue-toggle');
+      clues.forEach(el => {
+        if (showClues) {
+          el.classList.add('bg-amber-200/80', 'text-amber-950', 'font-semibold', 'ring-1', 'ring-amber-400');
+        } else {
+          el.classList.remove('bg-amber-200/80', 'text-amber-950', 'font-semibold', 'ring-1', 'ring-amber-400');
+        }
+      });
+      if (btn) {
+        btn.textContent = showClues ? "隱藏病歷關鍵紅旗提示" : "顯示病歷關鍵紅旗提示 (Red Flags)";
+      }
+    }
+
+    // Filter Medication Cards by Category
+    function filterMedCards(category) {
+      currentFilter = category;
+      document.querySelectorAll('.med-filter-btn').forEach(btn => {
+        if (btn.dataset.filter === category) {
+          btn.classList.add('ring-2', 'ring-offset-1', 'ring-blue-600', 'font-bold');
+        } else {
+          btn.classList.remove('ring-2', 'ring-offset-1', 'ring-blue-600', 'font-bold');
+        }
+      });
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    // Record Student Selection for a Medication
+    function selectMedDecision(medId, decision) {
+      studentSelections[medId] = decision;
+      updateScoreDisplay();
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    // Toggle Individual Medication Explanation
+    function toggleMedExplanation(medId) {
+      revealedMeds[medId] = !revealedMeds[medId];
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    // Grade All 10 Medications and Reveal Explanations
+    function checkAllQuizAnswers() {
+      medicationsData.forEach(m => {
+        revealedMeds[m.id] = true;
+      });
+      updateScoreDisplay(true);
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    // Reset Quiz
+    function resetQuiz() {
+      studentSelections = {};
+      if (currentMode === 'student') {
+        revealedMeds = {};
+      }
+      updateScoreDisplay(false);
+      renderMedicationCards();
+      lucide.createIcons();
+    }
+
+    function updateScoreDisplay(showScore = false) {
+      const badge = document.getElementById('quiz-score-badge');
+      const answeredCount = Object.keys(studentSelections).length;
+      let correctCount = 0;
+      medicationsData.forEach(m => {
+        if (studentSelections[m.id] === m.correctAction) {
+          correctCount++;
+        }
+      });
+
+      if (showScore || answeredCount === 10) {
+        const score = correctCount * 10;
+        const colorClass = score >= 80 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-amber-50 border-amber-300 text-amber-900';
+        badge.className = `px-3.5 py-2 rounded-xl border text-xs sm:text-sm font-bold ${colorClass}`;
+        badge.innerHTML = `測驗得分: <span class="text-base">${score}</span> / 100 分 (答對 ${correctCount}/10 題)`;
+      } else {
+        badge.className = "px-3.5 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700";
+        badge.innerHTML = `作答進度: <span class="text-blue-600">${answeredCount}</span>/10 題`;
+      }
+    }
+
+    // Render 10 Interactive Medication Cards
+    function renderMedicationCards() {
+      const container = document.getElementById('medications-grid');
+      const filtered = medicationsData.filter(m => currentFilter === 'all' || m.category === currentFilter);
+
+      const categoryStyles = {
+        stop: {
+          border: 'border-l-4 border-l-rose-600',
+          badge: 'bg-rose-100 text-rose-800 border-rose-200'
+        },
+        hold: {
+          border: 'border-l-4 border-l-orange-500',
+          badge: 'bg-orange-100 text-orange-800 border-orange-200'
+        },
+        adjust: {
+          border: 'border-l-4 border-l-amber-500',
+          badge: 'bg-amber-100 text-amber-900 border-amber-200'
+        },
+        continue: {
+          border: 'border-l-4 border-l-emerald-600',
+          badge: 'bg-emerald-100 text-emerald-800 border-emerald-200'
+        }
+      };
+
+      const options = [
+        { key: 'stop', label: '🔴 立即停用/禁忌' },
+        { key: 'hold', label: '🟠 急性期暫停 (Hold)' },
+        { key: 'adjust', label: '🟡 調整劑量/途徑' },
+        { key: 'continue', label: '🟢 繼續使用/監測' }
+      ];
+
+      container.innerHTML = filtered.map(med => {
+        const isRevealed = currentMode === 'instructor' || revealedMeds[med.id];
+        const userChoice = studentSelections[med.id];
+        const isCorrect = userChoice === med.correctAction;
+        const st = categoryStyles[med.category];
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 ${isRevealed ? st.border : ''} p-5 case-paper-shadow flex flex-col justify-between transition-all print-break-inside-avoid">
+            <div>
+              <!-- Top Row: Number, Drug Name & Action Badge -->
+              <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                <div class="flex items-start gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                    #${med.id}
+                  </span>
+                  <div>
+                    <h3 class="text-base font-bold text-slate-900 leading-snug">${med.name}</h3>
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                      <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${med.regimen}</span>
+                      <span class="text-xs text-slate-500">適應症: ${med.indication}</span>
+                    </div>
+                  </div>
+                </div>
+
+                ${isRevealed ? `
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-full border whitespace-nowrap ${st.badge}">
+                    ${med.actionLabel}
+                  </span>
+                ` : `
+                  <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap">
+                    待評估決策
+                  </span>
+                `}
+              </div>
+
+              <!-- Interactive Decision Buttons (For Student/Quiz Practice) -->
+              <div class="mt-3.5">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-semibold text-slate-600">請選擇您的臨床藥師處置決策：</span>
+                  ${userChoice ? `
+                    <span class="text-xs font-bold ${isCorrect ? 'text-emerald-600' : 'text-rose-600'}">
+                      ${isRevealed ? (isCorrect ? '✓ 判斷正確！' : '✗ 判斷有誤，請參考下方解析') : '已選擇 (點擊下方按鈕對答案)'}
+                    </span>
+                  ` : ''}
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  ${options.map(opt => {
+                    const selected = userChoice === opt.key;
+                    let btnStyle = "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100";
+                    if (selected && !isRevealed) {
+                      btnStyle = "bg-blue-600 text-white border-blue-600 font-semibold shadow-sm";
+                    } else if (isRevealed) {
+                      if (opt.key === med.correctAction) {
+                        btnStyle = "bg-emerald-600 text-white border-emerald-600 font-bold shadow-sm ring-2 ring-emerald-300";
+                      } else if (selected && opt.key !== med.correctAction) {
+                        btnStyle = "bg-rose-600 text-white border-rose-600 font-semibold opacity-90";
+                      }
+                    }
+                    return `
+                      <button onclick="selectMedDecision(${med.id}, '${opt.key}')" class="px-2.5 py-2 rounded-lg text-xs border transition-all text-center ${btnStyle}">
+                        ${opt.label}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+
+              <!-- Evidence-Based DRP Explanation Box -->
+              ${isRevealed ? `
+                <div class="mt-4 pt-3.5 border-t border-slate-200 space-y-2.5 text-xs sm:text-sm bg-slate-50/80 p-3.5 rounded-xl">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-bold text-slate-900">DRP 問題分類：</span>
+                    <span class="font-semibold text-rose-700">${med.drpType}</span>
+                  </div>
+                  <div>
+                    <span class="font-bold text-slate-900">腎功能門檻與限制：</span>
+                    <span class="text-slate-700">${med.renalThreshold}</span>
+                  </div>
+                  <div>
+                    <span class="font-bold text-slate-900">藥理機轉與臨床評估：</span>
+                    <p class="text-slate-700 mt-0.5 leading-relaxed whitespace-pre-line">${med.mechanism}</p>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-950">
+                    <span class="font-bold">💡 具體藥事建議：</span>
+                    <span>${med.recommendation}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center gap-1 pt-1">
+                    <i data-lucide="book-marked" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>實證依據：${med.guidelineRef}</span>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Card Footer Toggle Button -->
+            <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between no-print">
+              <span class="text-[11px] text-slate-400">eGFR: 12 mL/min/1.73m² | CrCl: 12.4 mL/min</span>
+              <button onclick="toggleMedExplanation(${med.id})" class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                <span>${isRevealed ? '收合實證解析' : '展開實證 DRP 解析'}</span>
+                <i data-lucide="${isRevealed ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Tab 3 Summary Table
+    function renderSummaryTable() {
+      const tbody = document.getElementById('summary-table-body');
+      tbody.innerHTML = medicationsData.map(m => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-3 px-3 font-bold text-slate-900">${m.id}</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-slate-900">${m.name}</div>
+            <div class="text-xs text-blue-700 font-semibold">${m.regimen}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-600">${m.indication}</td>
+          <td class="py-3 px-3 text-slate-700">${m.renalThreshold}</td>
+          <td class="py-3 px-3">
+            <span class="inline-block font-bold text-xs px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200 mb-1">
+              ${m.actionLabel}
+            </span>
+            <div class="text-xs text-slate-600">${m.recommendation}</div>
+          </td>
+          <td class="py-3 px-3 text-xs text-slate-500">${m.guidelineRef}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Tab 4 PGY Discussion Questions
+    function renderPgyQuestions() {
+      const container = document.getElementById('pgy-qa-container');
+      container.innerHTML = pgyQuestions.map((item, idx) => `
+        <details class="group bg-slate-50 border border-slate-200 rounded-xl p-4 open:bg-white open:shadow-sm transition-all">
+          <summary class="font-bold text-sm sm:text-base text-slate-900 cursor-pointer flex items-center justify-between gap-2 list-none">
+            <span>${item.q}</span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 flex-shrink-0">
+              點擊查看詳解
+            </span>
+          </summary>
+          <div class="mt-3 pt-3 border-t border-slate-200 text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+            ${item.a}
+          </div>
+        </details>
+      `).join('');
+    }
+
+    // =========================================================================
+    // 4. RENAL FUNCTION CALCULATOR (Cockcroft-Gault TBW & IBW)
+    // =========================================================================
+    function updateRenalCalc() {
+      const age = parseFloat(document.getElementById('calc-age').value) || 72;
+      const wt = parseFloat(document.getElementById('calc-wt').value) || 72;
+      const ht = parseFloat(document.getElementById('calc-ht').value) || 170;
+      const scr = parseFloat(document.getElementById('calc-scr').value) || 5.5;
+
+      // Male IBW (Devine formula): 50 + 2.3 * ((ht_cm / 2.54) - 60)
+      const heightInInches = ht / 2.54;
+      const ibw = Math.max(40, 50 + 2.3 * (heightInInches - 60));
+
+      const crclTbw = (((140 - age) * wt) / (72 * scr));
+      const crclIbw = (((140 - age) * ibw) / (72 * scr));
+
+      document.getElementById('calc-res-tbw').textContent = crclTbw.toFixed(1);
+      document.getElementById('calc-res-ibw').textContent = crclIbw.toFixed(1);
+      document.getElementById('calc-formula-tbw').textContent = `[(140-${age})×${wt}] / (72×${scr})`;
+      document.getElementById('calc-ibw-note').textContent = `IBW: ${ibw.toFixed(1)} kg | 伴隨下肢水腫(+2)宜參考乾體重/IBW`;
+    }
+
+    function resetCalculatorToJobs() {
+      document.getElementById('calc-age').value = 72;
+      document.getElementById('calc-wt').value = 72;
+      document.getElementById('calc-ht').value = 170;
+      document.getElementById('calc-scr').value = 5.5;
+      updateRenalCalc();
+    }
+
+    // =========================================================================
+    // 5. CLIPBOARD EXPORT FOR SOAP NOTE
+    // =========================================================================
+    function copySoapNote() {
+      const soapEl = document.getElementById('soap-content-area');
+      const textToCopy = soapEl.innerText;
+
+      const textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast("已將完整 SOAP 藥事照護紀錄複製到剪貼簿！");
+      } catch (err) {
+        showToast("複製失敗，請手動選取複製。");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notification');
+      document.getElementById('toast-message').textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Initialize on load
+    window.onload = initApp;
+  </script>
+</body>
+</html>
